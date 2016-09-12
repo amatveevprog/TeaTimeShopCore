@@ -4,7 +4,7 @@ var fs = require('fs');
 var Router = function()
 {
     this.libArray = [];
-    this.urlArray = [];// url-funtion
+    this.urlArray = [];
 }
 //прокачанный рекуайр!!!
 Router.prototype.require_2_0 = function(modulePath)
@@ -61,8 +61,8 @@ Router.prototype.getFunction = function(moduleName,funcName)
                 }
             }
         }
-    }return null;
-
+    }
+    return null;
 }
 //назначить исполняемую функцию конкретному урлу
 Router.prototype.assignFuncToUrl = function (url,moduleName,funcName)

@@ -1,4 +1,3 @@
-//TODO посмотреть оптимизацию, promises!!!
 //var querystring = require('querystring');
 var http = require('http');
 var url = require('url');
@@ -26,7 +25,7 @@ for(var i=0;i<arrURL.length;i++)
 {
     router.addToUrlArray(arrURL[i]);
 }
-//регистрация функций: 
+//регистрация функций:
 router.assignFuncToUrl(arrURL[0],"required",'plus');
 router.assignFuncToUrl(arrURL[1],"required",'concatenate');
 router.assignFuncToUrl(arrURL[2],"required",'array');
@@ -41,7 +40,6 @@ http.createServer(function(req,res)
         var paramsArray = parseQuery(urlParsed.query);
         //ищем соответствующую функцию и запускаем ее
         var result = router.executeOnUrl(urlParsed.pathname,paramsArray);
-        //promises
         res.statusCode=200;
         res.end("result:"+JSON.stringify(result));
     }
@@ -64,7 +62,7 @@ http.createServer(function(req,res)
             writeFile(fileName[0],urlParsed.pathname,body);
             //автоматически парсим и вынимаем все экспорт-функции!
             //process.exit();
-            
+
             router.automaticParse("."+urlParsed.pathname+"/"+fileName,"/API/");
             //sendFile("uploaded.html",res);
             res.end(JSON.stringify(router.urlArray));
@@ -98,7 +96,7 @@ http.createServer(function(req,res)
                 res.end("Page not found");
         }
     }*/
-}).listen(3000);
+}).listen(process.env.PORT || 3000);
 //получить массив параметров из запроса
 function parseQuery(queryString)
 {
