@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+        <html>
+    <body>
+    <h1> Загрузка файла модуля на сервер</h1>
+    <div>Выберите модуль для загрузки на сервер</div>
+    <form name = "upload">
+        <input type="file" name="module">
+        <input type="submit" value="Загрузить">
+        </form>
+    <div id="downloaded"></div>
+    <script>
+        document.forms.upload.onsubmit = function()
+        {
+            var input = this.elements.module;
+            var file = input.files[0];
+            //alert(input.files[0].fileName());
+            //process.exit();
+            //var fileName = input.files[0];
+            if(file)
+            {
+                upload(file);
+            }
+            return false;
+        };
+        function upload(file)
+        {
+            var xhr = new XMLHttpRequest();
+            //обработчики событий
+            xhr.onload = xhr.onerror = function()
+            {
+                if(this.status == 200) {
+                    console.log("Success!!!");
+                   /* var new_xhr = new XMLHttpRequest();
+                    new_xhr.onload = xhr.onerror = function()
+                    {
+                        if(this.status == 200) {
+                            console.log("Success!!! recievingFIle!");
+
+                            console.log(xhr.responseText);
+                        }
+                        else {
+                            console.log("error"+this.status);
+                        }
+                    }
+                    new_xhr.open("GET",'/uploaded',true);
+                    new_xhr.send(null);*/
+                    document.getElementById("downloaded").textContent = "Функции на сервере:";
+                    document.getElementById("downloaded").textContent += xhr.responseText;
+                    console.log(xhr.responceText);
+                }
+                else
+                {
+                    console.log("error"+this.status);
+                }
+            };
+            xhr.open("POST","/upload?module="+file.name,true);
+            //var fileDescr = JSON.stringify({"Name":})
+            xhr.send(file);
+        }
+        </script>
+    </body>
+    </html>
