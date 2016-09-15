@@ -20,3 +20,8 @@ example: >npm install express@4 --save<br>
         <input type="file" name="module" class="btn btn-default">
         <input type="submit" value="Загрузить" class="btn btn-default">
         </form>
+<br>
+<h2>Latest Updates:</h2>
+<p>
+When the server starts to listen the port [1000 by default], it looks up for the files that has been already uploaded to the server.Then it parses them to obtain the API-functions </p>
+<h2 style="color:yellow">TODO</h2>
