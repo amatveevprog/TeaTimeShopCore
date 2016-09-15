@@ -24,10 +24,6 @@ Vector.prototype.times = function(number)
     elem.y=this.y*number;
     return elem;
 }
-var vt = new Vector(1,2);
-console.log(vt.plus(new Vector(3,4)));
-console.log(vt.minus(new Vector(3,4)));
-console.log(vt.times(5));
 //преобразование в веб-методы
 exports.sumOfTwoVectors = function(x1,y1,x2,y2)
 {
@@ -79,4 +75,3 @@ exports.compositionOfTwoVectors = function(x1,y1,times)
     return vector1.times(times);
 }
 
-console.log(exports.compositionOfTwoVectors(1,2,10));
