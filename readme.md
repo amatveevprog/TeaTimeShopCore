@@ -1,3 +1,4 @@
+
 needs theese node modules to work:
 1)async
 2)express@4
@@ -12,4 +13,11 @@ additional if you need
 
 simply install theese modules via npm:
 example: >npm install express@4 --save
-<b>123</b>
+<b>an example of http-page</b>
+<h1> Загрузка файла модуля на сервер</h1>
+    <div>Выберите модуль для загрузки на сервер</div>
+    <hr/>
+    <form name = "upload">
+        <input type="file" name="module" class="btn btn-default">
+        <input type="submit" value="Загрузить" class="btn btn-default">
+        </form>
