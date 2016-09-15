@@ -11,12 +11,11 @@ additional if you need
 8)http
 9)fs
 
-simply install theese modules via npm:
-example: >npm install express@4 --save
-<b>an example of http-page</b>
+simply install theese modules via npm:<br>
+example: >npm install express@4 --save<br>
+<b>an example of http-page</b><br>
 <h1> Загрузка файла модуля на сервер</h1>
     <div>Выберите модуль для загрузки на сервер</div>
-    <hr/>
     <form name = "upload">
         <input type="file" name="module" class="btn btn-default">
         <input type="submit" value="Загрузить" class="btn btn-default">
