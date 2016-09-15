@@ -26,6 +26,6 @@ example: >npm install express@4 --save<br>
 When the server starts to listen the port [1000 by default], it looks up for the files that has been already uploaded to the server.Then it parses them to obtain the API-functions </p>
 <h2 style="color:yellow">TODO</h2>
 <p>tasks</p>
--[] ejs-templates
+-[x] ejs-templates
 -[] errors handling based on ejs
 -[] front-end aggregation and routing
