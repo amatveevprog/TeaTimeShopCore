@@ -29,3 +29,4 @@ When the server starts to listen the port [1000 by default], it looks up for the
 -[x] ejs-templates
 -[] errors handling based on ejs
 -[] front-end aggregation and routing
+@octocat :+1: This PR looks great - it's ready to merge! :shipit:
