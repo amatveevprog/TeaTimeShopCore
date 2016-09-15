@@ -1,31 +1,28 @@
+var EndpointError = require('./endpoint_error');
 var fs = require('fs');
-
+var async = require('async');
 
 var Router = function()
 {
     this.libArray = [];
-    this.urlArray = [];
-}
-//прокачанный рекуайр!!!
-Router.prototype.require_2_0 = function(modulePath)
-{
-    try
-    {
-        var required_module = require(modulePath);
-    }
-    catch (e)
-    {
-        console.log("файл по пути "+ modulePath+" не найден!");
-        return;
-    }
-    finally
-    {
+    this.urlArray = [];// pares: url^function
+};
+//еще более прокачанный require!!!
+Router.prototype.require_2_1 = function (modulePath,callback) {
+
+    var Router = this;
+    async.waterfall([function (callback) {
+        //
+        var required_module,required_cache;
+        required_module = require(modulePath);
+        required_cache = require.cache[require.resolve(modulePath)].exports;
+        callback(null,required_module,required_cache)
+    },function (module,cache,callback) {
+        //looking in cache for our included module...
         var arrayObject=[];
-        //TODO: следующий код ОЧЕНЬ ДОЛГО БУДЕТ ВЫПОЛНЯТЬСЯ! ОПТИМИЗИРОВАТЬ, УБРАВ НЕНУЖНЫЕ RESOLVE!!!
-        //1-смотрим кэш
-        for(key in require.cache[require.resolve(modulePath)].exports)
+        for(key in cache)
         {
-            var element = require.cache[require.resolve(modulePath)].exports[key];
+            var element = cache[key];
             //смотрим на элемент и на ключ
             if(typeof element=='function')
             {
@@ -35,16 +32,18 @@ Router.prototype.require_2_0 = function(modulePath)
                 arrayObject.push(funcToken);
             }
         }
+        callback(null,module,arrayObject);
+    },function (module,arrayObject,callback) {
         //проверка, что arrayObject не пустой
         if(arrayObject.length>0)
         {
             var moduleFuncObject = {"moduleName":require.cache[require.resolve(modulePath)].id,'funcObject':arrayObject};
             //добавление функции в массив библиотеки
-            this.libArray.push(moduleFuncObject);
+            Router.libArray.push(moduleFuncObject);
         }
-        return required_module;
-    }
-}
+        callback(null,module,arrayObject);
+    }],callback);
+};
 Router.prototype.getFunction = function(moduleName,funcName)
 {
     //ищем функцию в нашем массиве.
@@ -61,8 +60,8 @@ Router.prototype.getFunction = function(moduleName,funcName)
                 }
             }
         }
-    }
-    return null;
+    }return null;
+
 }
 //назначить исполняемую функцию конкретному урлу
 Router.prototype.assignFuncToUrl = function (url,moduleName,funcName)
@@ -84,6 +83,7 @@ Router.prototype.assignFuncToUrl = function (url,moduleName,funcName)
         throw(new Error("Function <"+funcName+"> not found or no such module: <"+moduleName+">"));
     //apply уже при вызове функции, т.к. мы не знаем количество параметров
 }
+//добавить в массив урл с пустой функцией
 Router.prototype.addToUrlArray = function(newURL)
 {
     var element = {'url':newURL,'Function':null};
@@ -116,7 +116,7 @@ Router.prototype.getNumOfFunctsInModule = function(moduleName)
     }
     return null;
 }
-Router.prototype.executeOnUrl = function(url,paramArray)
+Router.prototype.executeOnUrlSync = function(url,paramArray)
 {
     //смотрим urlArray:
     for(var i=0;i<this.urlArray.length;i++)
@@ -128,55 +128,91 @@ Router.prototype.executeOnUrl = function(url,paramArray)
     }
     return null;
 }
-//функция автоматического считывания из файла и преобразование export-функций файла в web-функции
-Router.prototype.automaticParse = function(filePath,url_prefix)
+Router.prototype.executeOnUrl = function(url,paramArray,callback)
 {
-    var requiredPtr = this.require_2_0(filePath);
-    //узнаем число функций
-    var numberOfModule = this.getNumOfFunctsInModule(filePath).moduleNumInArr;//получить номер модуля по названию
-    var out_param;
-    var numberOfFunctionsInModule = this.getNumOfFunctsInModule(filePath).length;
+    //смотрим urlArray:
+    for(var i=0;i<this.urlArray.length;i++) {
+        if (this.urlArray[i].url == url) {
+            if(paramArray!=null) {
+                return callback(null, this.urlArray[i].Function.apply(null, paramArray));
+            }
+            else
+            {
+                return callback(null, this.urlArray[i].Function.apply(null));
+            }
+        }
+    }
+    return callback(new EndpointError("No such endpoint!"));
+}
+//!new! асинхронная функция автоматического считывания из файла и преобразование export-функций файла в web-функции
+Router.prototype.automaticParse = function(filePath,url_prefix,callback)
+{
+    var requiredPtr;
+    var Router = this;
+    this.require_2_1(filePath,function (err,module,result) {
+        if(err) {
+            console.error("Error in require 2_1!");
+            throw(err);
+        }
+        else
+        {
+            requiredPtr = module;
+            console.log("successfull requisition of: "+result);
 
-    if(numberOfFunctionsInModule!=null) {
-        var nameOfModule = this.libArray[numberOfModule].moduleName;
-        var htmlModuleName = substrFromLastSymbol(nameOfModule,["/","\\"]).replace(".","_")+"_";
-        for (var i = 0; i <numberOfFunctionsInModule; i++) {
-            //пробегаемся по массиву, получаем имена функций
-            var my_function = this.libArray[numberOfModule].funcObject[i].funcPtr;
-            var my_functionName = this.libArray[numberOfModule].funcObject[i].nameOfFunc;
-            //генерим имя функции
-            var httpFunctionName = url_prefix+htmlModuleName+my_functionName;
-            //загоняем в массив
-            //1)addTourlArray
-            addUrlObjectToUrlArray(this.urlArray,httpFunctionName,my_function);
+
+            var numberOfModule = Router.getNumOfFunctsInModule(filePath).moduleNumInArr;//получить номер модуля по названию
+            var out_param;
+            var numberOfFunctionsInModule = Router.getNumOfFunctsInModule(filePath).length;
+
+            if(numberOfFunctionsInModule!=null) {
+                var nameOfModule = Router.libArray[numberOfModule].moduleName;
+                var htmlModuleName = substrFromLastSymbol(nameOfModule,["/","\\"]).replace(".","_")+"_";
+                for (var i = 0; i <numberOfFunctionsInModule; i++) {
+                    //пробегаемся по массиву, получаем имена функций
+                    var my_function = Router.libArray[numberOfModule].funcObject[i].funcPtr;
+                    var my_functionName = Router.libArray[numberOfModule].funcObject[i].nameOfFunc;
+                    //генерим имя функции
+                    var httpFunctionName = url_prefix+htmlModuleName+my_functionName;
+                    //загоняем в массив
+                    //1)addTourlArray
+                    addUrlObjectToUrlArray(Router.urlArray,httpFunctionName,my_function);
+                }
+            }
+            //return requiredPtr;
+            //необходимо вызвать callback с urlArray
+            callback(null,Router.urlArray);
+            //функция - вынуть подстроку начиная с определенного символа
+            //пример: из строки C://path/module.js вынуть module.js
+            function substrFromLastSymbol(myString,arrSymbols)
+            {
+                var positionOfSymbol=-1;
+                for(var i=myString.length-1;i>=0;i--)
+                {
+                    if (arrSymbols.some(elem => elem==myString[i])) {
+                    positionOfSymbol = i;
+                    break;
+                }
+                }
+                if(positionOfSymbol>=0)
+                {
+                    return myString.substr(positionOfSymbol+1);
+                }
+                return myString;
+            }
+
+
+
         }
-    }
-    return requiredPtr;
-    //функция - вынуть подстроку начиная с определенного символа
-    //пример: из строки C://path/module.js вынуть module.js
-    function substrFromLastSymbol(myString,arrSymbols)
-    {
-        var positionOfSymbol=-1;
-        for(var i=myString.length-1;i>=0;i--)
-        {
-            if (arrSymbols.some(elem => elem==myString[i])) {
-            positionOfSymbol = i;
-            break;
-        }
-        }
-        if(positionOfSymbol>=0)
-        {
-            return myString.substr(positionOfSymbol+1);
-        }
-        return myString;
-    }
+    });
+    //узнаем число функций
+
 }
 Router.prototype.getAllNamesOfFunctions = function()
 {
     var allNames = [];
     this.urlArray.forEach(function(current,index)
     {
-        
+
     });
 }
 //добавить в массив объект с урлом и назначенной ему функцией
@@ -199,7 +235,7 @@ function checkModuleStringInPath(path,module)
     var fileStr = fileArray[fileArray.length-1];//получили имя файла с расширением(если оно есть)
     var fileNameWithoutExt = fileStr.split(".")[0];
 
-    var moduleSpl1
+    var moduleSpl1;
     if(module.includes("\\"))
     {
         moduleSpl1 = module.split("\\");

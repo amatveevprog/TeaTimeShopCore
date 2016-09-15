@@ -2,12 +2,13 @@
   "name": "TeaTimeCore",
   "version": "0.0.1",
   "dependencies": {
-    "express": "~2.5.9",
-    "pg": "~2.x",
-    "mime": "~1.2.7",
+    "express": "^4.14.0",
     "googleapis": "~4.x",
-    "mongodb": "~1.x"
+    "mime": "^1.2.11",
+    "mkdirp": "^0.5.1",
+    "mongodb": "~1.x",
+    "pg": "~2.x",
+    "serve-static": "^1.11.1"
   },
-  "engines": {
-  }
+  "engines": {}
 }
