@@ -12,7 +12,7 @@ additional if you need<br>
 9)fs<br>
 
 simply install theese modules via npm:<br>
-example: >`npm install express@4 --save`<br>
+example: <br> `npm install express@4 --save`<br>
 <b>an example of http-page</b><br>
 <h1> Загрузка файла модуля на сервер</h1>
     <div>Выберите модуль для загрузки на сервер</div>
