@@ -102,10 +102,10 @@ exports.uploadFile = function(req,res,callback){
     async.waterfall([
         function(callback)
         {
-            console.log("1st waterfall");
+
             var urlParsed = Url.parse(req.url);
             var fileName = parseQuery(urlParsed.query);
-            console.log("fileName"+fileName);
+
             //принимаем файл
             var body='';
             req.on('readable',function()
@@ -122,13 +122,13 @@ exports.uploadFile = function(req,res,callback){
         function(body,urlParsed,fileName,callback)
         {
             //создаем директорию
-            console.log("waterfall create dir");
+
             var mkdirp = require('mkdirp');
             var dirName = urlParsed.pathname;
             mkdirp("./" + dirName,function(err){
                 if(err)
                 {
-                    console.log("error creating directory: "+dirName);
+
                     callback(new UploadError("Ошибка создания директории: "+dirName));
                 }
                 else {
