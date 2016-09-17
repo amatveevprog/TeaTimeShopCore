@@ -29,6 +29,6 @@ example: <br> `npm install express@4 --save`<br>
 -[:+1:] ejs-templates<br>
 -[:+1:] errors handling based on ejs<br>
 -[:+1:] front-end aggregation and routing<br>
-@octocat :+1: This PR looks great - it's ready to merge! :shipit:
+
 
 >SPERMASPRULEN!!!
