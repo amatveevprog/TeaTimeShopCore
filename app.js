@@ -2,6 +2,7 @@ var express1 = require('express');
 var http = require('http');
 var path = require('path');
 var app = express1();
+var config = require('./config');
 
 //var log = require('libs/log')(module);
 //var errorHandler = require('errorhandler');
@@ -16,6 +17,7 @@ var static1 = require('serve-static');
 //var mongoose = require('libs/mongoose');
 
 require('./routes/index')(app);
+console.log(path.join(__dirname,'public'));
 app.use(static1(path.join(__dirname,'public')));
 app.use(function(err,req,res,next){
     if(typeof err == 'number')
@@ -24,14 +26,14 @@ app.use(function(err,req,res,next){
     }
     res.end("Error!");
 });
-var server = http.createServer(app).listen(1000,function()
+var server = http.createServer(app).listen(config.get('port'),function()
 {
     //log.info('Express server listening on port '+ 1000);
     //logger('Express server listening on port '+ 1000);
     
-    console.log("Server started. Listening on port 1000");
+    console.log("Server started. Listening on port "+ config.get('port'));
     //при старте сервера мониторим папку uploads и загружаем все модули из нее
-    require('./async_core').lookupAndMakeEndpoints("./upload",function (err,resultArr) {
+    require('./async_core').lookupAndMakeEndpoints(config.get('api_upload_dir'),function (err,resultArr) {
         if(err)
         {
             throw err;

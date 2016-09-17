@@ -9,6 +9,9 @@ var HttpError = require('../errors').HttpError;
 var UploadError = require('../errors').UploadError;
 var EndpointError = require('./endpoint_error');
 var FindFiles = require('node-find-files');
+var config = require('../config');
+//from config: api_api_prefix;
+
 
 //получить массив параметров из запроса
 //returns the array of params
@@ -30,14 +33,7 @@ var parseQuery = function (queryString)
     }
     return arr;
 };
-/*var hasApiUrl = function(url,callback)
-{
-    if (router.hasUrl(url))
-    {
-        callback(null,true);
-    }
-    callback(new EndpointError("Api Url Not Found"));
-}*/
+
 //execute enpoint API in backend
 // params:
 //urlParsed = url.parse(req.url)
@@ -157,7 +153,8 @@ exports.uploadFile = function(req,res,callback){
         function(urlParsed,fileName,callback)
         {
             //преобразуем в массив функций
-            router.automaticParse(".."+urlParsed.pathname+"/"+fileName,"/API/",function (err,urlArray){
+            //router.automaticParse(".."+urlParsed.pathname+"/"+fileName,"/API/",function (err,urlArray){
+            router.automaticParse(".."+urlParsed.pathname+"/"+fileName,config.get('api_api_prefix'),function (err,urlArray){
                 if(err)
                 {
                     callback(new UploadError("Ошибка преобразования модуля в API-методы"));
@@ -208,7 +205,8 @@ exports.lookupAndMakeEndpoints = function(dirPath,callback)
                         return count<paths.length;
                     },function(callback){
 
-                        router.automaticParse("../"+paths[count],"/API/",function (err){
+                        //router.automaticParse("../"+paths[count],"/API/",function (err){
+                        router.automaticParse("../"+paths[count],config.get('api_api_prefix'),function (err){
                             count++;
                             callback(err,count);
                         });

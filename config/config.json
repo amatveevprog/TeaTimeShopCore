@@ -1,0 +1,7 @@
+{
+  "port":1000,
+  "mongoose":{},
+  "session":{},
+  "api_upload_dir":"./upload",
+  "api_api_prefix":"\/API\/"
+}
