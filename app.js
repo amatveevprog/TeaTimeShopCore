@@ -26,7 +26,7 @@ app.use(function(err,req,res,next){
     }
     res.end("Error!");
 });
-var server = http.createServer(app).listen(config.get('port'),function()
+var server = http.createServer(app).listen(process.env.PORT||config.get('port'),function()
 {
     //log.info('Express server listening on port '+ 1000);
     //logger('Express server listening on port '+ 1000);
