@@ -8,7 +8,7 @@ var router = require('./asyncRouter');
 var HttpError = require('../errors').HttpError;
 var UploadError = require('../errors').UploadError;
 var EndpointError = require('./endpoint_error');
-
+var FindFiles = require('node-find-files');
 
 //получить массив параметров из запроса
 //returns the array of params
@@ -180,55 +180,55 @@ exports.uploadFile = function(req,res,callback){
 //и в ней файлы, которые нужно включить НЕ через клиентский запрос(/upload?module=test.js)
 exports.lookupAndMakeEndpoints = function(dirPath,callback)
 {
+    var paths = [];
     fs.stat(dirPath,function (err,stats) {
         if(err)
         {
             if(err.code!='ENOENT')
             {
-               return callback(err);
+                return callback(err);
             }
         }
         else
         {
-            //stats.isDirectory();
-            //if dir exists, we make all work
-            async.waterfall([function (callback) {
-                if(stats.isDirectory())
-                {
-                    fs.readdir(dirPath,{encoding:'utf-8'},function(err,files){
-                        if(err){ throw err;}
-                        else
-                        {
-                            callback(null,files);
-                        }
+
+            if(stats.isDirectory())
+            {
+                //ищем файлы во всех поддиректориях
+                var Finder = new FindFiles({
+                    rootFolder:dirPath,
+                    filterFunction : function (path, stat){if(stat.isFile()){return true;}else{return false;}}
+                });
+                Finder.on("match",function(path,stat){
+                    paths.push(path);
+                });
+                Finder.on("complete",function(){
+                    var count=0;
+                    async.whilst(function(){
+                        return count<paths.length;
+                    },function(callback){
+
+                        router.automaticParse("../"+paths[count],"/API/",function (err){
+                            count++;
+                            callback(err,count);
+                        });
+                    },function(err,cnt){
+                        callback(err,router.urlArray);
                     });
-                }
-                else
-                {
-                    callback(new Error(dirPath+" is not Directory"));
-                }
-            },function (files,callback) {
-                //проверяем каждый файл
-                var apiUrls=[];
-                for(var i=0;i<files.length;i++)
-                {
-                    router.automaticParse("."+dirPath+"/"+files[i],"/API/",function (err,urlArray){
-                        if(err)
-                        {
-                            throw(err);
-                            //callback(new UploadError("Ошибка преобразования модуля в API-методы"));
-                        }
-                        else
-                        {
-                            //callback(null,urlArray);
-                            //apiUrls = apiUrls.concat(urlArray);
-                            //urlArray=[];
-                            apiUrls = urlArray;
-                        }
-                    });
-                }
-                callback(null,apiUrls);
-            }],callback);
+                });
+                Finder.on("patherror",function (err,strPath) {
+                    console.log("Error in path "+strPath+" "+err);
+                });
+                Finder.on("error",function(err){
+                    console.log("Global Error: "+err);
+                });
+                Finder.startSearch();
+            }
+            else
+            {
+                callback(new Error(dirPath+" is not Directory"));
+            }
+
         }
     });
 };

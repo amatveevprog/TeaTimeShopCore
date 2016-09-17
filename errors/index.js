@@ -20,7 +20,7 @@ function UploadError(message) {
 
     this.message = "Server Upload Error :\r\n"+message;
 }
-util.inherits(UploadError,Error);
+
 HttpError.prototype.name = 'UploadError';
 exports.HttpError = HttpError;
 exports.UploadError = UploadError;

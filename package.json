@@ -3,10 +3,13 @@
   "version": "0.0.1",
   "dependencies": {
     "express": "^4.14.0",
+    "fs": "0.0.1-security",
     "googleapis": "~4.x",
     "mime": "^1.2.11",
     "mkdirp": "^0.5.1",
     "mongodb": "~1.x",
+    "nconf": "^0.8.4",
+    "node-find-files": "0.0.4",
     "pg": "~2.x",
     "serve-static": "^1.11.1"
   },

@@ -38,10 +38,10 @@ var server = http.createServer(app).listen(1000,function()
         }
         else
         {
-            console.log(resultArr.length);
+            /*console.log(resultArr.length);
             resultArr.forEach(function (cur,index) {
                 console.log(cur);
-            })
+            })*/
         }
     });
 });

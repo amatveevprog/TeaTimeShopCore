@@ -151,13 +151,13 @@ Router.prototype.automaticParse = function(filePath,url_prefix,callback)
     var Router = this;
     this.require_2_1(filePath,function (err,module,result) {
         if(err) {
-            console.error("Error in require 2_1!");
+            //console.error("Error in require 2_1!");
             throw(err);
         }
         else
         {
             requiredPtr = module;
-            console.log("successfull requisition of: "+result);
+            //console.log("successfull requisition of: "+result);
 
 
             var numberOfModule = Router.getNumOfFunctsInModule(filePath).moduleNumInArr;//получить номер модуля по названию

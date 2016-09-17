@@ -1,7 +1,7 @@
 var asyncRouter = require('../async_core');
 //лучше использовать не asyncRouter, а индекс внутри async.core!
 var HttpError = require('../errors').HttpError;
-exports.get = function(req,res){
+exports.get = function(req,res,next){
     //проверка на корректный урл
     asyncRouter.executeFunction(req.url,function(err,result){
        if(err)
